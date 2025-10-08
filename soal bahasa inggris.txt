@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mengurutkan Kata Bahasa Inggris</title>
+  <style>
+    body {
+      background-color: #145A32; /* hijau tua */
+      font-family: Arial, sans-serif;
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #F9F9F9;
+    }
+
+    .container {
+      background-color: #A9DFBF; /* hijau muda */
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    #word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .word {
+      background-color: #2ECC71;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: grab;
+      font-size: 16px;
+      user-select: none;
+    }
+
+    textarea {
+      width: 80%;
+      height: 80px;
+      border-radius: 5px;
+      font-size: 18px;
+      padding: 10px;
+      resize: none;
+      background-color: #fff; /* putih */
+      color: #000;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #1E8449;
+      color: white;
+    }
+
+    #feedback {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Urutkan Kata Bahasa Inggris</h1>
+
+  <div class="container">
+    <p>Seret dan jatuhkan kata-kata di bawah ini ke kotak untuk membentuk kalimat yang benar.</p>
+
+    <div id="word-bank"></div>
+
+    <textarea id="sentence" placeholder="Taruh kata di sini dengan urutan yang benar..." ondragover="allowDrop(event)" ondrop="drop(event)"></textarea>
+
+    <div>
+      <button onclick="cekHasil()">Hasil</button>
+      <button onclick="resetGame()">Reset</button>
+    </div>
+
+    <div id="feedback"></div>
+  </div>
+
+  <script>
+    const words = ["I", "am", "going", "to", "the", "market"];
+    let shuffled = [];
+
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [
+          array[randomIndex], array[currentIndex]
+        ];
+      }
+      return array;
+    }
+
+    function loadWords() {
+      const bank = document.getElementById("word-bank");
+      bank.innerHTML = "";
+      shuffled = shuffle([...words]);
+      shuffled.forEach(word => {
+        const div = document.createElement("div");
+        div.textContent = word;
+        div.classList.add("word");
+        div.draggable = true;
+        div.id = "word-" + word;
+        div.addEventListener("dragstart", drag);
+        bank.appendChild(div);
+      });
+    }
+
+    function drag(event) {
+      event.dataTransfer.setData("text", event.target.id);
+    }
+
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      const data = event.dataTransfer.getData("text");
+      const wordElement = document.getElementById(data);
+      if (wordElement) {
+        const textarea = document.getElementById("sentence");
+        textarea.value += (textarea.value ? "-" : "") + wordElement.textContent;
+        wordElement.remove(); // hilangkan kata yang sudah dipindah
+      }
+    }
+
+    function cekHasil() {
+      const answer = document.getElementById("sentence").value.trim();
+      const feedback = document.getElementById("feedback");
+      if (answer === "I-am-going-to-the-market") {
+        feedback.textContent = "Jawaban Anda benar, hebat!";
+        feedback.style.color = "green";
+      } else {
+        feedback.textContent = "Maaf, jawaban Anda salah. Ulangi lagi.";
+        feedback.style.color = "red";
+      }
+    }
+
+    function resetGame() {
+      document.getElementById("sentence").value = "";
+      document.getElementById("feedback").textContent = "";
+      loadWords();
+    }
+
+    // Inisialisasi saat pertama kali dibuka
+    loadWords();
+  </script>
+
+</body>
+</html>
